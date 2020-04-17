@@ -3,6 +3,7 @@ import { Text, FlatList, ScrollView } from 'react-native'
 import { Card, ListItem } from 'react-native-elements'
 import { connect } from 'react-redux'
 import { baseUrl } from '../shared/baseUrl'
+import { Loading } from './LoadingComponent'
 
 const mapStateToProps = state => {
   return {
@@ -50,13 +51,37 @@ function RenderLeaders(props) {
 export class About extends Component {
 
   render() {
-    //leaders contains isloading, and the leaders[] hence we do leaders.leaders
-    return (
-      <ScrollView>
-        <History></History>
-        <RenderLeaders leaders={this.props.leaders.leaders}></RenderLeaders>
-      </ScrollView>
-    )
+
+    if (this.props.leaders.isLoading) {
+      return (
+        <ScrollView>
+          <History></History>
+          <Card title='Corporate Leadership'></Card>
+          <Loading></Loading>
+        </ScrollView>
+      )
+    }
+
+    else if (this.props.leaders.errMess) {
+      return (
+        <ScrollView>
+          <History></History>
+          <Card title='Corporate Leadership'>
+            <Text>{this.props.leaders.errMess}</Text>
+          </Card>
+        </ScrollView>
+      )
+    }
+
+    else {
+      //leaders contains isloading, and the leaders[] hence we do leaders.leaders
+      return (
+        <ScrollView>
+          <History></History>
+          <RenderLeaders leaders={this.props.leaders.leaders}></RenderLeaders>
+        </ScrollView>
+      )
+    }
   }
 }
 

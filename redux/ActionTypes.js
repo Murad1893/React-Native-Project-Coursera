@@ -9,3 +9,5 @@ export const PROMOS_FAILED = 'PROMOS_FAILED';
 export const LEADERS_LOADING = 'LEADERS_LOADING';
 export const ADD_LEADERS = 'ADD_LEADERS';
 export const LEADERS_FAILED = 'LEADERS_FAILED';
+export const POST_FAVORITE = 'POST_FAVORITE'; //this will update the favorite at the server side and server will send reply when it has done this
+export const ADD_FAVORITE = 'ADD_FAVORITE';

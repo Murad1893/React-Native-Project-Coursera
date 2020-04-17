@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
-import { View, Text, FlatList } from 'react-native'
+import { View, Text, FlatList, ScrollView } from 'react-native'
 import { Card, ListItem } from 'react-native-elements'
 import { LEADERS } from '../shared/leaders'
-import { ScrollView } from 'react-native-gesture-handler'
-import { YellowBox } from 'react-native'
 
 function History(props) {
   return (
@@ -30,20 +28,16 @@ function RenderLeaders(props) {
     );
   };
   return (
-    <View>
+    <Card title="Corporate Leadership">
       <FlatList
         data={props.leaders}
         renderItem={renderMenuItem}
         keyExtractor={item => item.id.toString()}
       />
-    </View>
+    </Card>
   );
 
 }
-
-YellowBox.ignoreWarnings([
-  'VirtualizedLists should never be nested', // TODO: Remove when fixed
-])
 
 export class About extends Component {
 
@@ -58,9 +52,7 @@ export class About extends Component {
     return (
       <ScrollView>
         <History></History>
-        <Card title="Corporate Leadership">
-          <RenderLeaders leaders={this.state.leaders}></RenderLeaders>
-        </Card>
+        <RenderLeaders leaders={this.state.leaders}></RenderLeaders>
       </ScrollView>
     )
   }

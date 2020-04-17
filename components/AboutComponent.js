@@ -1,7 +1,15 @@
 import React, { Component } from 'react'
-import { View, Text, FlatList, ScrollView } from 'react-native'
+import { Text, FlatList, ScrollView } from 'react-native'
 import { Card, ListItem } from 'react-native-elements'
-import { LEADERS } from '../shared/leaders'
+import { connect } from 'react-redux'
+import { baseUrl } from '../shared/baseUrl'
+
+const mapStateToProps = state => {
+  return {
+    //we only map the part that is required by this component
+    leaders: state.leaders //now no need for this.state in constructor
+  }
+}
 
 function History(props) {
   return (
@@ -15,23 +23,23 @@ function History(props) {
 }
 
 function RenderLeaders(props) {
-
-  const renderMenuItem = ({ item, index }) => {
+  const renderLeader = ({ item, index }) => {
     return (
       <ListItem
         key={index}
         title={item.name}
         subtitle={item.description}
         hideChevron={true}
-        leftAvatar={{ source: require('./images/alberto.png') }}
+        leftAvatar={{ source: { uri: baseUrl + item.image } }}
       />
     );
   };
+
   return (
     <Card title="Corporate Leadership">
       <FlatList
         data={props.leaders}
-        renderItem={renderMenuItem}
+        renderItem={renderLeader}
         keyExtractor={item => item.id.toString()}
       />
     </Card>
@@ -41,21 +49,15 @@ function RenderLeaders(props) {
 
 export class About extends Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      leaders: LEADERS
-    }
-  }
-
   render() {
+    //leaders contains isloading, and the leaders[] hence we do leaders.leaders
     return (
       <ScrollView>
         <History></History>
-        <RenderLeaders leaders={this.state.leaders}></RenderLeaders>
+        <RenderLeaders leaders={this.props.leaders.leaders}></RenderLeaders>
       </ScrollView>
     )
   }
 }
 
-export default About
+export default connect(mapStateToProps)(About);

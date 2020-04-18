@@ -12,6 +12,7 @@ import About from './AboutComponent'
 import { connect } from 'react-redux';
 import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from '../redux/ActionCreators';
 import Reservation from './ReservationComponent';
+import Favorites from './FavoriteComponent';
 
 const mapStateToProps = state => {
   return {
@@ -167,12 +168,42 @@ function ReservationNavigatorScreen() {
   )
 }
 
+const FavoriteNavigator = createStackNavigator()
+
+function FavoriteNavigatorScreen() {
+  return (
+    <FavoriteNavigator.Navigator
+      initialRouteName='Favorites'
+      screenOptions={HeaderOptions}
+    >
+
+      <FavoriteNavigator.Screen
+        name='Favorites'
+        component={Favorites}
+        options={({ navigation }) => ({
+          headerStyle: {
+            backgroundColor: "#512DA8"
+          },
+          headerTitleStyle: {
+            color: "#fff"
+          },
+          headerTintColor: "#fff",
+          headerLeft: () => <Icon name="menu" size={24}
+            iconStyle={{ color: 'white' }}
+            onPress={() => navigation.toggleDrawer()} />
+        })}>
+      </FavoriteNavigator.Screen>
+
+    </FavoriteNavigator.Navigator>
+  )
+}
+
 const MainNavigator = createDrawerNavigator();
 
 function MainNavigatorDrawer() {
   return (
     <MainNavigator.Navigator
-      initialRouteName="Menu"
+      initialRouteName="Home"
       drawerStyle={{
         backgroundColor: '#D1C4E9'
       }}
@@ -228,6 +259,19 @@ function MainNavigatorDrawer() {
         drawerIcon: ({ color, focused }) => (
           <Icon
             name='cutlery'
+            type='font-awesome'
+            size={24}
+            iconStyle={{ color: color }}
+          />
+        )
+      }} />
+
+      <MainNavigator.Screen name="Favorites" component={FavoriteNavigatorScreen} options={{
+        title: 'My Favorites',
+        drawerLabel: 'My Favorites',
+        drawerIcon: ({ color, focused }) => (
+          <Icon
+            name='heart'
             type='font-awesome'
             size={24}
             iconStyle={{ color: color }}

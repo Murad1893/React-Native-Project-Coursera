@@ -172,7 +172,7 @@ const MainNavigator = createDrawerNavigator();
 function MainNavigatorDrawer() {
   return (
     <MainNavigator.Navigator
-      initialRouteName="Home"
+      initialRouteName="Menu"
       drawerStyle={{
         backgroundColor: '#D1C4E9'
       }}

@@ -152,3 +152,20 @@ export const addFavorite = (dishId) => ({
   type: ActionTypes.ADD_FAVORITE,
   payload: dishId //adding the favorite
 });
+
+export const addComment = (comment) => ({
+  type: ActionTypes.ADD_COMMENT,
+  payload: comment
+});
+
+export const postComment = (dishId, rating, author, comment) => (dispatch) => {
+
+  const newComment = { dishId, rating, author, comment }
+
+  newComment.date = new Date().toISOString();
+
+  setTimeout(() => {
+    dispatch(addComment(newComment));
+  }, 2000); //simulating the delay here
+}
+

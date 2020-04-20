@@ -33,10 +33,15 @@ function RenderDish(props) {
   //over here we are only recongizing the right to left gesture
   const recognizeDrag = ({ moveX, moveY, dx, dy }) => { //this will recognize that user has performed a drag
     if (dx < -200) //only interested in the right to left gesture (swipe left)
-      return true;
+      return true
     else
       return false;
   }
+
+  const recognizeComment = ({ moveX, moveY, dx, dy }) => {
+    return (dx > 200) ? true : false;
+  };
+
 
   const panResponder = PanResponder.create({
     //various callback functions implemented here
@@ -47,7 +52,7 @@ function RenderDish(props) {
     onPanResponderGrant: () => { handleViewRef.rubberBand(1000).then(endState => console.log(endState.finished ? 'finished' : 'cancelled')); },
     onPanResponderEnd: (e, gestureState) => { //when user lifts finger off the screen
       console.log("pan responder end", gestureState);
-      if (recognizeDrag(gestureState))
+      if (recognizeDrag(gestureState)) {
         Alert.alert(
           'Add Favorite',
           'Are you sure you wish to add ' + dish.name + ' to favorite?',
@@ -57,7 +62,10 @@ function RenderDish(props) {
           ],
           { cancelable: false }
         );
-
+      }
+      else if (recognizeComment(gestureState)) {
+        props.toggleModal();
+      }
       return true;
     }
   })

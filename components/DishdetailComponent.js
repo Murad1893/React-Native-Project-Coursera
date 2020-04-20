@@ -23,6 +23,8 @@ function RenderDish(props) {
 
   const dish = props.dish;
 
+  let handleViewRef = null;
+
   //MoveX is the latest screen coordinates of the recently moved touch gesture
   //moveY is the screen coordinates of the recently moved touch
   //dx is the accumulated distance of the gesture since the touch started along the X direction.
@@ -41,6 +43,8 @@ function RenderDish(props) {
     onStartShouldSetPanResponder: (e, gestureState) => { //gesture state contains the info regarding the gesture done
       return true; //this will show that the panResponder will start responding to it
     },
+    //will be called when the PanResponder starts recognizing and it has been granted the permission to respond to the pan, just here on the screen
+    onPanResponderGrant: () => { handleViewRef.rubberBand(1000).then(endState => console.log(endState.finished ? 'finished' : 'cancelled')); },
     onPanResponderEnd: (e, gestureState) => { //when user lifts finger off the screen
       console.log("pan responder end", gestureState);
       if (recognizeDrag(gestureState))
@@ -61,7 +65,8 @@ function RenderDish(props) {
   if (dish != null) {
     return (
       //we must add the panhandlers in order for the gesture to be applied
-      <Animatable.View animation="fadeInDown" duration={2000} delay={1000} {...panResponder.panHandlers}>
+      //ref indicates that this view will call this function
+      <Animatable.View animation="fadeInDown" duration={2000} delay={1000} ref={ref => handleViewRef = ref} {...panResponder.panHandlers}>
         <Card
           featuredTitle={dish.name}
           image={{ uri: baseUrl + dish.image }}>

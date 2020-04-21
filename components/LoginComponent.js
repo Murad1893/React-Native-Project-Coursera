@@ -114,6 +114,20 @@ class RegisterTab extends Component {
 
   }
 
+  //processing the image
+  processImage = async (imageUri) => {
+    let processedImage = await ImageManipulator.manipulate(
+      imageUri,
+      [
+        { resize: { width: 400 } }
+      ],
+      { format: 'png' }
+    );
+    console.log(processedImage);
+    this.setState({ imageUrl: processedImage.uri });
+
+  }
+
   handleRegister() {
     console.log(JSON.stringify(this.state));
     if (this.state.remember)
@@ -228,7 +242,7 @@ const styles = StyleSheet.create({
   }
 });
 
-//adding the bottom navigation
+//adding the bottom navigations
 const Login = createBottomTabNavigator()
 
 function LoginScreen() {

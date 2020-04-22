@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, StyleSheet, Picker, Switch, Button, Modal, Alert } from 'react-native';
+import { Text, View, ScrollView, StyleSheet, Picker, Switch, Button, Modal, Alert, Platform } from 'react-native';
 import DatePicker from 'react-native-datepicker'
 import * as Animatable from 'react-native-animatable';
 import { Notifications } from 'expo';
 import * as Permissions from 'expo-permissions';
+import * as Calendar from 'expo-calendar'
 
 class Reservation extends Component {
 
@@ -36,6 +37,66 @@ class Reservation extends Component {
     return smoking ? 'Yes' : 'No';
   }
 
+  //will ask for permission to access the calendar on the device.
+  obtainCalendarPermission = async () => {
+    //getting the permission
+    const calenderPermission = await Permissions.askAsync(Permissions.CALENDAR);
+    if (calenderPermission === 'granted') {
+      return true
+    }
+    else return false
+  }
+
+
+  addReservationToCalendar = async (date) => {
+    if (this.obtainCalendarPermission()) {
+      //getting the default calender
+      let defaultCalendar;
+      let event_date = new Date(Date.parse(date))
+      //intializing the event details
+      const eventDetails = {
+        title: 'Con Fusion Table Reservation',
+        startDate: event_date,
+        endDate: new Date(Date.parse(date) + 2 * 60 * 60 * 1000),
+        timeZone: 'Asia/Hong_Kong',
+        location: '121, Clear Water Bay Road, Clear Water Bay, Kowloon, Hong Kong'
+      }
+      if (Platform.OS === 'ios') { //checking for the platform
+        defaultCalendar = await this.getDefaultCalendarSource()
+      }
+      else if (Platform.OS === 'android') {
+        const calendars = await Calendar.getCalendarsAsync();
+        const defaultCalendarSource = {
+          isLocalAccount: true, name: 'Default', //setting the source name as default
+        }
+        const defaultCalendars = calendars.filter(each =>
+          each.source.name === 'Default' //checking whether any already default calender exists
+        );
+        if (defaultCalendars.length === 0) { //if there is no default calendar
+          const newCalendar = await Calendar.createCalendarAsync({
+            title: 'Expo Calendar',
+            color: 'blue',
+            entityType: Calendar.EntityTypes.EVENT,
+            sourceId: defaultCalendarSource.id,
+            source: defaultCalendarSource,
+            name: 'internalCalendarName',
+            ownerAccount: 'personal',
+            accessLevel: Calendar.CalendarAccessLevel.OWNER,
+          });
+
+          defaultCalendar = newCalendar //set the default calender as the new calendar
+        }
+        else {
+          defaultCalendar = defaultCalendars[0]
+        }
+      }
+      await Calendar.createEventAsync(defaultCalendar.id, eventDetails) //create an event
+    }
+    else {
+      Alert.alert('Permission not granted to show notifications');
+    }
+  }
+
   handleReservation() {
     console.log(JSON.stringify(this.state));
     Alert.alert(
@@ -52,6 +113,8 @@ class Reservation extends Component {
       ],
       { cancelable: false }
     );
+
+    this.addReservationToCalendar(this.state.date)
   }
 
   resetForm() {

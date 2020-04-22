@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, ScrollView, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, Image } from 'react-native';
 import { Input, CheckBox, Button, Icon } from 'react-native-elements';
 import * as SecureStore from 'expo-secure-store'
 import * as ImagePicker from 'expo-image-picker'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Permissions from 'expo-permissions';
 import { baseUrl } from '../shared/baseUrl';
+import Constants from 'expo-constants'
 
 class LoginTab extends Component {
 
@@ -65,13 +66,25 @@ class LoginTab extends Component {
           center
           checked={this.state.remember}
           onPress={() => this.setState({ remember: !this.state.remember })}
-          inputContainerStyle={styles.formCheckbox}
+          containerStyle={styles.formCheckbox}
         />
         <View style={styles.formButton}>
           <Button
             onPress={() => this.handleLogin()}
             title="Login"
             color="#512DA8"
+            icon={
+              <Icon
+                name="sign-in"
+                type='font-awesome'
+                size={24}
+                color="white"
+                paddingRight={10}
+              />
+            }
+            buttonStyle={{
+              backgroundColor: "#512DA8"
+            }}
           />
         </View>
       </View>
@@ -114,6 +127,22 @@ class RegisterTab extends Component {
 
   }
 
+  getImageFromGallery = async () => {
+    const cameraPermission = await Permissions.askAsync(Permissions.CAMERA);
+    const cameraRollPermission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
+    if (cameraPermission.status === 'granted' && cameraRollPermission.status === 'granted') {
+      let galleryImage = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3], //setting the aspect ratio
+      });
+      if (!galleryImage.cancelled) {
+        console.log(galleryImage);
+        this.setState({ imageUrl: galleryImage.uri });
+      }
+    }
+  }
+
   //processing the image
   processImage = async (imageUri) => {
     let processedImage = await ImageManipulator.manipulate(
@@ -148,6 +177,10 @@ class RegisterTab extends Component {
             <Button
               title="Camera"
               onPress={this.getImageFromCamera}
+            />
+            <Button
+              title="Gallery"
+              onPress={this.getImageFromGallery}
             />
           </View>
           <Input
@@ -215,6 +248,48 @@ class RegisterTab extends Component {
   }
 }
 
+//adding the bottom navigations
+const Login = createBottomTabNavigator()
+
+function LoginScreen() {
+  return (
+    <Login.Navigator
+      initialRouteName={'Login'}
+      tabBarOptions={{
+        activeBackgroundColor: '#9575CD',
+        inactiveBackgroundColor: '#D1C4E9',
+        activeTintColor: '#ffffff',
+        inactiveTintColor: 'gray'
+      }}
+    >
+      <Login.Screen name="Login" component={LoginTab}
+        options={{
+          title: '',
+          tabBarIcon: ({ color }) => (
+            <Icon
+              name='sign-in'
+              type='font-awesome'
+              size={30}
+              iconStyle={{ color: color, paddingTop: 15 }}
+            />
+          )
+        }} />
+      <Login.Screen name="Register" component={RegisterTab}
+        options={{
+          title: '',
+          tabBarIcon: ({ color, focused }) => (
+            <Icon
+              name='user-plus'
+              type='font-awesome'
+              size={30}
+              iconStyle={{ color: color, paddingTop: 15 }}
+            />
+          )
+        }} />
+    </Login.Navigator>
+  )
+}
+
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
@@ -223,7 +298,8 @@ const styles = StyleSheet.create({
   imageContainer: {
     flex: 1,
     flexDirection: 'row',
-    margin: 20
+    margin: 20,
+    justifyContent: 'space-around'
   },
   image: {
     margin: 10,
@@ -241,47 +317,5 @@ const styles = StyleSheet.create({
     margin: 60,
   }
 });
-
-//adding the bottom navigations
-const Login = createBottomTabNavigator()
-
-function LoginScreen() {
-  return (
-    <Login.Navigator
-      initialRouteName={'Register'}
-      tabBarOptions={{
-        activeBackgroundColor: '#9575CD',
-        inactiveBackgroundColor: '#D1C4E9',
-        activeTintColor: '#ffffff',
-        inactiveTintColor: 'gray'
-      }}
-    >
-      <Login.Screen name="Login" component={LoginTab}
-        options={{
-          title: 'Login',
-          tabBarIcon: ({ color }) => (
-            <Icon
-              name='sign-in'
-              type='font-awesome'
-              size={24}
-              iconStyle={{ color: color }}
-            />
-          )
-        }} />
-      <Login.Screen name="Register" component={RegisterTab}
-        options={{
-          title: 'Register',
-          tabBarIcon: ({ color, focused }) => (
-            <Icon
-              name='user-plus'
-              type='font-awesome'
-              size={24}
-              iconStyle={{ color: color }}
-            />
-          )
-        }} />
-    </Login.Navigator>
-  )
-}
 
 export default LoginScreen;
